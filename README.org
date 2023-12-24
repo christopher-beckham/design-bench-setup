@@ -1,0 +1,34 @@
+* Installing MujoCo
+
+Follow the instructions [[https://github.com/openai/mujoco-py][here]], which involve downloading and extracting mujoco as well as installing the key. Then export the following key to wherever the library is, e.g:
+
+#+BEGIN_SRC bash
+export MUJOCO_PY_MUJOCO_PATH=~/bin/mujoco/mujoco210 
+#+END_SRC
+
+** Compiling mujoco-py
+
+=design-baselines= appears to be using version =mujoco-py==2.0.2.3=, but I had trouble trying to install this. I was only able to install it by following [[https://github.com/openai/mujoco-py/issues/773][these]] instructions which suggest to do the [[https://github.com/openai/mujoco-py/issues/773#issuecomment-1712434247][the following:]]
+
+- (1) Add a compiler directive =compiler_directives={'legacy_implicit_noexcept': True}= to the line 239 of =mujoco_py/builder.py=
+- (2) Update Cython to the latest version
+
+This means cloning the mujoco-py repo and installing with =pip install .=
+
+This worked for me so long as I exported my =LD_LIBRARY_PATH= to be the following (note that the compilation log will tell you if something is missing in this path which you need to add):
+
+#+BEGIN_SRC bash
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:~/bin/mujoco/mujoco210/bin:/usr/lib/nvidia
+#+END_SRC
+
+The last issue involved something to do with some missing libs which need to be installed. While this can be easily done with root privileges and =apt-get=, you can also install them with conda by following [[https://github.com/openai/mujoco-py/issues/627#issuecomment-1007658905][these instructions]]:
+
+#+BEGIN_SRC bash
+conda install -c conda-forge glew
+conda install -c conda-forge mesalib
+conda install -c menpo glfw3
+export CPATH=$CONDA_PREFIX/include
+pip install patchelf
+#+END_SRC
+
+
